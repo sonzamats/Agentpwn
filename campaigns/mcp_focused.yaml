@@ -1,0 +1,93 @@
+# AgentPwn Campaign: MCP-Focused Audit
+#
+# Targets MCP-specific attack vectors only. Use this when auditing an
+# agent that connects to MCP tool servers and you want to evaluate its
+# resilience against malicious server responses, tool shadowing, and
+# capability abuse.
+#
+# Usage:
+#   agentpwn run campaigns/mcp_focused.yaml
+#   python examples/basic_scan.py campaigns/mcp_focused.yaml
+#
+# Before running:
+#   1. Replace the target configuration with your MCP agent's details.
+#   2. Set the appropriate API key environment variable.
+#   3. Change permission_confirmed to true after confirming authorization.
+
+name: mcp-focused-audit
+description: >-
+  Focused audit of MCP (Model Context Protocol) attack vectors. Tests
+  malicious server responses, tool shadowing, and capability abuse --
+  the three primary threat categories unique to the MCP ecosystem.
+
+target:
+  name: my-mcp-agent
+  target_type: mcp
+  endpoint: http://localhost:3000/mcp
+  model: gpt-4
+  tools:
+    - name: web_search
+      description: Search the web via MCP tool server
+      parameters:
+        type: object
+        properties:
+          query:
+            type: string
+      permissions:
+        - network
+      risk_level: medium
+    - name: file_read
+      description: Read files from the filesystem via MCP
+      parameters:
+        type: object
+        properties:
+          path:
+            type: string
+      permissions:
+        - read
+      risk_level: high
+    - name: send_email
+      description: Send email via MCP tool server
+      parameters:
+        type: object
+        properties:
+          to:
+            type: string
+          subject:
+            type: string
+          body:
+            type: string
+      permissions:
+        - network
+        - write
+      risk_level: high
+    - name: database_query
+      description: Query a database via MCP tool server
+      parameters:
+        type: object
+        properties:
+          sql:
+            type: string
+      permissions:
+        - read
+        - write
+      risk_level: critical
+  system_prompt: You are a helpful assistant with access to MCP tools.
+  auth:
+    api_key: ${OPENAI_API_KEY}
+
+# Only MCP attack modules
+attack_modules:
+  - mcp_malicious_server
+  - mcp_tool_shadowing
+  - mcp_capability_abuse
+
+max_attempts_per_module: 10
+timeout_seconds: 300
+parallel: false
+
+report_formats:
+  - json
+  - html
+
+permission_confirmed: false
