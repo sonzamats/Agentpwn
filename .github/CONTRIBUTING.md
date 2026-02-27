@@ -1,133 +1,232 @@
 # Contributing to AgentPwn
 
-Thank you for your interest in contributing to AgentPwn! This guide will help you
-get started with development, testing, and submitting changes.
+Thank you for your interest in contributing to AgentPwn. This document provides
+guidelines and information to help you get started.
+
+---
+
+## Code of Conduct
+
+By participating in this project, you agree to maintain a respectful and
+inclusive environment. Be constructive in feedback, patient with newcomers, and
+professional in all interactions.
+
+---
+
+## How to Contribute
+
+### Reporting Bugs
+
+1. Search [existing issues](https://github.com/wyattmatson/agentpwn/issues) to
+   avoid duplicates.
+2. Use the [bug report template](ISSUE_TEMPLATE/bug_report.md).
+3. Include reproduction steps, expected behavior, actual behavior, and
+   environment details.
+
+### Suggesting Features
+
+1. Search existing issues and discussions first.
+2. Use the [feature request template](ISSUE_TEMPLATE/feature_request.md).
+3. Describe the problem you are solving, not just the solution you want.
+
+### Submitting Code
+
+1. Fork the repository.
+2. Create a feature branch from `main`:
+   ```bash
+   git checkout -b feature/my-feature main
+   ```
+3. Make your changes (see [Development Setup](#development-setup) below).
+4. Write or update tests.
+5. Ensure all checks pass:
+   ```bash
+   ruff check agentpwn tests
+   ruff format --check agentpwn tests
+   mypy agentpwn
+   pytest
+   ```
+6. Commit with a clear message (see [Commit Messages](#commit-messages)).
+7. Push to your fork and open a pull request.
+
+---
 
 ## Development Setup
 
-1. **Clone the repository:**
+### Prerequisites
 
-   ```bash
-   git clone https://github.com/wyattmatson/agentpwn.git
-   cd agentpwn
-   ```
+- Python 3.10 or later
+- Git
 
-2. **Create and activate a virtual environment:**
-
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate   # Linux / macOS
-   .venv\Scripts\activate      # Windows
-   ```
-
-3. **Install the package in editable mode with dev dependencies:**
-
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
-   This installs AgentPwn along with pytest, ruff, mypy, and other development
-   tools.
-
-## Running Tests
-
-Run the full test suite:
+### Install
 
 ```bash
+git clone https://github.com/wyattmatson/agentpwn.git
+cd agentpwn
+pip install -e ".[dev,all]"
+```
+
+### Running Tests
+
+```bash
+# All tests
 pytest
-```
 
-Run tests with a coverage report:
-
-```bash
+# With coverage
 pytest --cov=agentpwn --cov-report=term-missing
-```
 
-Skip slow or integration tests during local development:
+# Specific test file
+pytest tests/test_attacks/test_indirect_injection.py -v
 
-```bash
+# Skip slow/integration tests
 pytest -m "not slow and not integration"
 ```
 
-## Code Style
+### Linting and Formatting
 
-This project uses **Ruff** for linting and formatting and **mypy** for static
-type checking. Please make sure your changes pass all three checks before
-submitting a pull request.
+AgentPwn uses [Ruff](https://docs.astral.sh/ruff/) for linting and formatting:
 
 ```bash
 # Lint
 ruff check agentpwn tests
 
-# Format check (use without --check to auto-format)
-ruff format --check agentpwn tests
+# Auto-fix lint issues
+ruff check --fix agentpwn tests
 
-# Type check
+# Format
+ruff format agentpwn tests
+
+# Check formatting without modifying
+ruff format --check agentpwn tests
+```
+
+### Type Checking
+
+```bash
 mypy agentpwn
 ```
 
-Key style points:
+---
 
-- Target Python version: 3.10+
-- Line length limit: 100 characters
-- All public functions and methods must have type annotations
-- Use `from __future__ import annotations` where appropriate
+## Project Structure
 
-## Adding New Attack Modules
+```
+agentpwn/
+├── core/          # Engine, config, models, logging, reporting
+├── targets/       # Target connectors (BaseTarget subclasses)
+├── attacks/       # Attack modules (BaseAttack subclasses)
+│   ├── prompt_injection/
+│   ├── tool_manipulation/
+│   ├── privilege_escalation/
+│   ├── multi_agent/
+│   └── mcp_attacks/
+├── defenses/      # Reference defense implementations
+└── utils/         # Shared utilities
+```
 
-Attack modules live in `agentpwn/attacks/`. To add a new attack:
+---
 
-1. Create a new file under `agentpwn/attacks/` (e.g., `my_attack.py`).
-2. Subclass the base attack class defined in `agentpwn/attacks/base.py` and
-   implement the required interface methods.
-3. Register the attack in `agentpwn/attacks/__init__.py` so it is discoverable
-   by the framework.
-4. Add corresponding tests in `tests/test_attacks/`.
-5. Include a YAML campaign example in `campaigns/` if the attack can be
-   demonstrated standalone.
+## Writing Attack Modules
 
-## Adding New Target Connectors
+See [docs/adding_modules.md](../docs/adding_modules.md) for a complete guide.
+In brief:
 
-Target connectors live in `agentpwn/targets/`. To add a new connector:
+1. Create a file in the appropriate `agentpwn/attacks/<category>/` directory.
+2. Subclass `BaseAttack`.
+3. Set metadata: `name`, `category`, `description`, `severity`, `mitre_mapping`.
+4. Implement `get_payloads()` and `execute()`.
+5. Write tests in `tests/test_attacks/`.
 
-1. Create a new file under `agentpwn/targets/` (e.g., `my_target.py`).
-2. Subclass the base target class defined in `agentpwn/targets/base.py` and
-   implement the required interface methods (connect, send, receive, etc.).
-3. Register the connector in `agentpwn/targets/__init__.py`.
-4. Add corresponding tests in `tests/test_targets/`.
-5. If the connector requires an extra dependency, add an optional-dependencies
-   group in `pyproject.toml` and guard the import accordingly.
+The module is auto-discovered. No registration needed.
 
-## Pull Request Process
+---
 
-1. **Fork** the repository and create a feature branch from `main`:
+## Writing Target Connectors
 
-   ```bash
-   git checkout -b feature/my-change
-   ```
+1. Create a file in `agentpwn/targets/`.
+2. Subclass `BaseTarget`.
+3. Implement all abstract methods: `initialize`, `send_message`,
+   `send_tool_output`, `get_tool_calls`, `reset`, `get_conversation_history`.
+4. Register in `_TARGET_CONNECTORS` in `core/engine.py`.
+5. Add a `TargetType` enum value in `core/models.py`.
+6. Write tests in `tests/test_targets/`.
 
-2. Make your changes, ensuring all tests pass and code style checks are clean.
+---
 
-3. Write or update tests to cover your changes.
+## Commit Messages
 
-4. Commit with a clear, descriptive commit message.
+Use clear, descriptive commit messages:
 
-5. **Push** your branch and open a pull request against `main`.
+```
+<type>: <short summary>
 
-6. In the PR description, explain **what** changed and **why**. Link any related
-   issues.
+<optional body explaining why, not what>
+```
 
-7. A maintainer will review your PR. Please be responsive to feedback -- we aim
-   to keep the review cycle short.
+Types:
 
-### PR Checklist
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `test` | Adding or updating tests |
+| `refactor` | Code change that neither fixes nor adds |
+| `ci` | CI/CD changes |
+| `chore` | Build, tooling, dependency updates |
 
-- [ ] Tests pass locally (`pytest`)
-- [ ] Linting passes (`ruff check`, `ruff format --check`)
-- [ ] Type checking passes (`mypy agentpwn`)
-- [ ] New code includes type annotations
-- [ ] Documentation updated if applicable
+Examples:
+
+```
+feat: add system prompt extraction attack module
+fix: handle timeout in MCP target connector
+docs: add MCP-focused campaign example
+test: add coverage for parameter injection edge cases
+```
+
+---
+
+## Pull Request Guidelines
+
+1. **One PR per feature or fix.** Keep changes focused and reviewable.
+2. **Include tests.** All new code should have corresponding test coverage.
+3. **Update documentation.** If your change affects user-facing behavior, update
+   the relevant docs.
+4. **Pass all checks.** The CI pipeline runs lint, type check, and tests. PRs
+   with failing checks will not be merged.
+5. **Keep PRs small.** Large PRs are hard to review. Break big features into
+   incremental PRs when possible.
+6. **Describe your changes.** The PR description should explain what changed,
+   why, and how to test it.
+
+---
+
+## Copyright and License
+
+All contributions must be licensed under the Apache License 2.0. Include the
+copyright header in all new source files:
+
+```python
+# Copyright 2026 Wyatt Matson / Matson Capital Group LLC
+# Licensed under the Apache License, Version 2.0
+```
+
+By submitting a pull request, you agree that your contribution is licensed
+under the same terms.
+
+---
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability in AgentPwn itself (not in a target
+system being tested), please report it responsibly:
+
+- **Do not** open a public issue.
+- Email `wyatt@matsoncapitalgroup.com` with details.
+- We will acknowledge receipt within 48 hours and provide a timeline for a fix.
+
+---
 
 ## Questions?
 
-Open an issue or start a discussion on GitHub. We are happy to help!
+Open a [discussion](https://github.com/wyattmatson/agentpwn/discussions) or
+reach out via the issue tracker.

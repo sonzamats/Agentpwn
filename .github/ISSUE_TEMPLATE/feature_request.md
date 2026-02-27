@@ -3,24 +3,50 @@ name: Feature Request
 about: Suggest a new feature or improvement for AgentPwn
 title: "[FEATURE] "
 labels: enhancement
-assignees: ""
+assignees: ''
 ---
 
-## Problem Description
+## Problem Statement
 
-A clear and concise description of the problem this feature would solve.
-Example: "I'm always frustrated when ..."
+A clear description of the problem you are trying to solve. What is frustrating
+or missing?
+
+Example: "I'm always frustrated when I need to test MCP servers that use
+custom authentication, because there's no way to configure custom auth
+headers in the MCP target connector."
 
 ## Proposed Solution
 
-A clear and concise description of what you would like to happen. Include any
-API sketches, CLI examples, or workflow descriptions that illustrate the feature.
+A clear description of what you want to happen.
 
 ## Alternatives Considered
 
-A clear and concise description of any alternative solutions or features you
-have considered and why they are insufficient.
+Describe any alternative solutions or workarounds you have considered.
 
-## Additional Context
+## Use Case
 
-Add any other context, mockups, or references about the feature request here.
+Describe a concrete use case where this feature would be valuable.
+
+## Category
+
+Which part of AgentPwn does this relate to?
+
+- [ ] Attack module (new module or enhancement to existing)
+- [ ] Target connector (new target type or enhancement)
+- [ ] Core engine (campaign execution, configuration)
+- [ ] Reporting (new format, better output)
+- [ ] CLI (new command, better UX)
+- [ ] Documentation
+- [ ] CI/CD or tooling
+- [ ] Other
+
+## Implementation Ideas (Optional)
+
+If you have thoughts on how this could be implemented, share them here.
+This is optional -- we are happy to design the implementation.
+
+## Checklist
+
+- [ ] I searched existing issues and feature requests for duplicates.
+- [ ] I described the problem, not just a solution.
+- [ ] This feature aligns with AgentPwn's mission of security testing for agentic AI systems.
