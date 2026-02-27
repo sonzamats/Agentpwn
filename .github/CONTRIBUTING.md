@@ -17,7 +17,7 @@ professional in all interactions.
 
 ### Reporting Bugs
 
-1. Search [existing issues](https://github.com/wyattmatson/agentpwn/issues) to
+1. Search [existing issues](https://github.com/sonzamats/Agentpwn/issues) to
    avoid duplicates.
 2. Use the [bug report template](ISSUE_TEMPLATE/bug_report.md).
 3. Include reproduction steps, expected behavior, actual behavior, and
@@ -60,7 +60,7 @@ professional in all interactions.
 ### Install
 
 ```bash
-git clone https://github.com/wyattmatson/agentpwn.git
+git clone https://github.com/sonzamats/Agentpwn.git
 cd agentpwn
 pip install -e ".[dev,all]"
 ```
@@ -228,5 +228,5 @@ system being tested), please report it responsibly:
 
 ## Questions?
 
-Open a [discussion](https://github.com/wyattmatson/agentpwn/discussions) or
+Open a [discussion](https://github.com/sonzamats/Agentpwn/discussions) or
 reach out via the issue tracker.

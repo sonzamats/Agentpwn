@@ -10,7 +10,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/agentpwn.svg)](https://pypi.org/project/agentpwn/)
 [![Python](https://img.shields.io/pypi/pyversions/agentpwn.svg)](https://pypi.org/project/agentpwn/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/wyattmatson/agentpwn/actions/workflows/ci.yml/badge.svg)](https://github.com/wyattmatson/agentpwn/actions/workflows/ci.yml)
+[![CI](https://github.com/sonzamats/Agentpwn/actions/workflows/ci.yml/badge.svg)](https://github.com/sonzamats/Agentpwn/actions/workflows/ci.yml)
 
 **The first open-source security testing framework for agentic AI systems.**
 
@@ -257,7 +257,7 @@ If you use AgentPwn in academic research, please cite:
   title        = {{AgentPwn}: Security Testing Framework for Agentic {AI} Systems},
   year         = {2026},
   publisher    = {GitHub},
-  url          = {https://github.com/wyattmatson/agentpwn},
+  url          = {https://github.com/sonzamats/Agentpwn},
   version      = {0.1.0},
   license      = {Apache-2.0}
 }

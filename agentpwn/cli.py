@@ -118,7 +118,7 @@ def _print_banner() -> None:
     console.print(f"  [bold cyan]{_TAGLINE}[/bold cyan]")
     console.print(
         f"  [dim]v{agentpwn.__version__} -- "
-        f"https://github.com/wyattmatson/agentpwn[/dim]"
+        f"https://github.com/sonzamats/Agentpwn[/dim]"
     )
     console.print()
 

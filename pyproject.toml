@@ -76,10 +76,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/wyattmatson/agentpwn"
-Documentation = "https://github.com/wyattmatson/agentpwn/tree/main/docs"
-Repository = "https://github.com/wyattmatson/agentpwn"
-Issues = "https://github.com/wyattmatson/agentpwn/issues"
+Homepage = "https://github.com/sonzamats/Agentpwn"
+Documentation = "https://github.com/sonzamats/Agentpwn/tree/main/docs"
+Repository = "https://github.com/sonzamats/Agentpwn"
+Issues = "https://github.com/sonzamats/Agentpwn/issues"
 
 [project.scripts]
 agentpwn = "agentpwn.cli:main"

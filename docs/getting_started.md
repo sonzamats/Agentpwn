@@ -52,7 +52,7 @@ pip install agentpwn[all]
 ### Development Install
 
 ```bash
-git clone https://github.com/wyattmatson/agentpwn.git
+git clone https://github.com/sonzamats/Agentpwn.git
 cd agentpwn
 pip install -e ".[dev]"
 ```
