@@ -1,33 +1,32 @@
-# AgentPwn Campaign: MCP-Focused Audit
+# AgentPwn MCP-Focused Campaign
 #
-# Targets MCP-specific attack vectors only. Use this when auditing an
-# agent that connects to MCP tool servers and you want to evaluate its
-# resilience against malicious server responses, tool shadowing, and
-# capability abuse.
+# A targeted campaign for agents connected to MCP (Model Context Protocol)
+# servers. Tests MCP-specific attack vectors alongside general prompt
+# injection and tool manipulation that apply to MCP environments.
 #
 # Usage:
 #   agentpwn run campaigns/mcp_focused.yaml
-#   python examples/basic_scan.py campaigns/mcp_focused.yaml
 #
 # Before running:
-#   1. Replace the target configuration with your MCP agent's details.
-#   2. Set the appropriate API key environment variable.
-#   3. Change permission_confirmed to true after confirming authorization.
+#   1. Set your API key:  export OPENAI_API_KEY="sk-..."
+#   2. Ensure your MCP server is running and accessible.
+#   3. Update the target configuration below.
+#   4. Set permission_confirmed to true.
 
-name: mcp-focused-audit
-description: >-
-  Focused audit of MCP (Model Context Protocol) attack vectors. Tests
-  malicious server responses, tool shadowing, and capability abuse --
-  the three primary threat categories unique to the MCP ecosystem.
+name: mcp-security-audit
+description: >
+  Focused security audit for MCP-connected agents. Tests tool shadowing,
+  capability abuse, malicious server simulation, plus general injection
+  and tool manipulation vectors that apply to MCP environments.
 
 target:
   name: my-mcp-agent
   target_type: mcp
-  endpoint: http://localhost:3000/mcp
   model: gpt-4
+  endpoint: http://localhost:8080/mcp
   tools:
     - name: web_search
-      description: Search the web via MCP tool server
+      description: Search the web for information
       parameters:
         type: object
         properties:
@@ -36,8 +35,9 @@ target:
       permissions:
         - network
       risk_level: medium
-    - name: file_read
-      description: Read files from the filesystem via MCP
+
+    - name: read_file
+      description: Read a file from the filesystem
       parameters:
         type: object
         properties:
@@ -46,8 +46,21 @@ target:
       permissions:
         - read
       risk_level: high
+
+    - name: database_query
+      description: Execute a SQL query
+      parameters:
+        type: object
+        properties:
+          query:
+            type: string
+      permissions:
+        - read
+        - write
+      risk_level: high
+
     - name: send_email
-      description: Send email via MCP tool server
+      description: Send an email
       parameters:
         type: object
         properties:
@@ -61,26 +74,41 @@ target:
         - network
         - write
       risk_level: high
-    - name: database_query
-      description: Query a database via MCP tool server
+
+    - name: code_execute
+      description: Execute code in a sandbox
       parameters:
         type: object
         properties:
-          sql:
+          code:
             type: string
       permissions:
-        - read
-        - write
+        - execute
       risk_level: critical
-  system_prompt: You are a helpful assistant with access to MCP tools.
+
   auth:
     api_key: ${OPENAI_API_KEY}
 
-# Only MCP attack modules
+# MCP-specific modules plus cross-cutting attacks relevant to MCP.
 attack_modules:
-  - mcp_malicious_server
+  # MCP-specific attack surface
   - mcp_tool_shadowing
   - mcp_capability_abuse
+  - mcp_malicious_server
+
+  # Prompt injection (applies to MCP agents via tool outputs)
+  - tool_output_injection
+  - indirect_injection
+
+  # Tool manipulation (MCP tools are the primary attack surface)
+  - parameter_injection
+  - schema_abuse
+  - tool_confusion
+  - chain_exploitation
+
+  # Privilege escalation (MCP permission model)
+  - permission_bypass
+  - cross_tool_escalation
 
 max_attempts_per_module: 10
 timeout_seconds: 300
@@ -88,6 +116,8 @@ parallel: false
 
 report_formats:
   - json
+  - markdown
   - html
 
+# REQUIRED: Set to true only if you have authorization to test this target.
 permission_confirmed: false

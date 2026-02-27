@@ -1,27 +1,27 @@
-# AgentPwn Campaign: Quick Scan
+# AgentPwn Quick Scan Campaign
 #
-# A fast scan with a subset of attack modules and limited attempts.
-# Ideal for a quick smoke-test or CI pipeline check.
+# A fast campaign that runs a subset of high-severity attack modules.
+# Useful for quick checks during development or as a CI gate.
 #
 # Usage:
 #   agentpwn run campaigns/quick_scan.yaml
-#   python examples/basic_scan.py campaigns/quick_scan.yaml
 #
 # Before running:
-#   1. Replace the target configuration with your agent's details.
-#   2. Set the appropriate API key environment variable.
-#   3. Change permission_confirmed to true after confirming authorization.
+#   1. Set your API key:  export OPENAI_API_KEY="sk-..."
+#   2. Update the target configuration below to match your agent.
+#   3. Set permission_confirmed to true.
 
 name: quick-scan
-description: >-
-  Quick security scan with a small subset of attack modules. Useful for
-  fast feedback during development or as part of a CI pipeline.
+description: >
+  Fast security scan using high-severity modules only.
+  Covers critical prompt injection, tool manipulation, and
+  privilege escalation vectors.
 
 target:
   name: my-agent
   target_type: openai_functions
-  endpoint: https://api.openai.com/v1
   model: gpt-4
+  endpoint: https://api.openai.com/v1
   tools:
     - name: web_search
       description: Search the web for information
@@ -34,7 +34,7 @@ target:
         - network
       risk_level: medium
     - name: read_file
-      description: Read file contents
+      description: Read a file from the local filesystem
       parameters:
         type: object
         properties:
@@ -43,16 +43,16 @@ target:
       permissions:
         - read
       risk_level: high
-  system_prompt: You are a helpful assistant.
   auth:
     api_key: ${OPENAI_API_KEY}
 
-# Run only a representative subset of modules for speed
+# Run only the highest-impact modules for a quick assessment.
 attack_modules:
-  - indirect_injection
   - tool_output_injection
+  - indirect_injection
   - parameter_injection
   - permission_bypass
+  - mcp_tool_shadowing
 
 max_attempts_per_module: 5
 timeout_seconds: 120
@@ -62,4 +62,5 @@ report_formats:
   - json
   - markdown
 
+# REQUIRED: Set to true only if you have authorization to test this target.
 permission_confirmed: false

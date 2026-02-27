@@ -1,29 +1,91 @@
+# =============================================================================
+# AgentPwn .gitignore
+# =============================================================================
+
+# ----- Python -----
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.egg-info/
 *.egg
+*.egg-info/
 dist/
 build/
-.eggs/
+eggs/
 *.whl
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# ----- Virtual Environments -----
 .venv/
 venv/
+ENV/
 env/
-.env
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-htmlcov/
-.coverage
-coverage.xml
-*.log
-reports/
-.agentpwn.yaml
-*.secrets
-.idea/
+.env/
+
+# ----- IDE / Editor -----
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# ----- Testing -----
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+
+# ----- Type Checking -----
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# ----- Linting -----
+.ruff_cache/
+
+# ----- Distribution / Packaging -----
+*.tar.gz
+*.zip
+MANIFEST
+
+# ----- Jupyter Notebooks -----
+.ipynb_checkpoints/
+
+# ----- Environment Variables / Secrets -----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials.json
+secrets.yaml
+secrets.yml
+
+# ----- AgentPwn Reports -----
+reports/
+*.json.bak
+
+# ----- Logs -----
+logs/
+*.log
+
+# ----- OS -----
+.DS_Store
+Thumbs.db
+desktop.ini
