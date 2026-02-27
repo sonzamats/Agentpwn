@@ -3,79 +3,81 @@
 
 """Basic scan example.
 
-Demonstrates how to load a campaign configuration from a YAML file,
-create a CampaignEngine, run the campaign, and display results.
-
-Usage:
-    python examples/basic_scan.py campaigns/quick_scan.yaml
-
-Before running, ensure you have:
-    1. Set the appropriate API key environment variable (e.g. OPENAI_API_KEY).
-    2. Updated the campaign YAML with your target details.
-    3. Set permission_confirmed: true after confirming authorization.
+Demonstrates the simplest way to run an AgentPwn security scan:
+load a campaign configuration, execute it, and display results.
 """
 
 from __future__ import annotations
 
 import asyncio
-import sys
-from pathlib import Path
 
 from agentpwn.core.config import load_campaign_config
 from agentpwn.core.engine import CampaignEngine
 
 
-async def main(config_path: str) -> None:
-    """Load a campaign config and run a basic scan.
-
-    Args:
-        config_path: Path to a campaign YAML file.
-    """
+async def main() -> None:
     # ------------------------------------------------------------------
-    # 1. Load the campaign configuration from YAML
+    # Step 1: Load the campaign configuration from a YAML file.
+    #
+    # The config describes the target agent (type, model, tools, auth)
+    # and the attack parameters (which modules, timeouts, report formats).
+    # API keys are resolved from environment variables automatically.
     # ------------------------------------------------------------------
-    print(f"Loading campaign config from: {config_path}")
-    config = load_campaign_config(config_path)
-
-    print(f"Campaign : {config.name}")
-    print(f"Target   : {config.target.name} ({config.target.target_type.value})")
-    print(f"Modules  : {config.attack_modules or 'all (auto-discover)'}")
-    print(f"Parallel : {config.parallel}")
-    print()
+    config = load_campaign_config("campaigns/quick_scan.yaml")
 
     # ------------------------------------------------------------------
-    # 2. Create the campaign engine
+    # Step 2: Create the campaign engine.
+    #
+    # The engine orchestrates the entire scan: it loads the target
+    # connector, discovers attack modules, runs them, and collects
+    # results. The report_dir is where output files will be written.
     # ------------------------------------------------------------------
     engine = CampaignEngine(config, report_dir="./reports")
 
     # ------------------------------------------------------------------
-    # 3. Run the campaign
+    # Step 3: Initialize the engine.
+    #
+    # This connects to the target agent and discovers available attack
+    # modules. If specific modules are listed in the config, only those
+    # are loaded; otherwise all modules are used.
     # ------------------------------------------------------------------
-    print("Initializing campaign...")
     await engine.initialize()
 
-    print(f"Loaded {len(engine.attack_modules)} attack module(s). Starting scan...\n")
+    # ------------------------------------------------------------------
+    # Step 4: Run the campaign.
+    #
+    # Each attack module generates payloads and delivers them to the
+    # target via the target connector. Results are collected and a
+    # CampaignReport is returned with findings, risk score, and summary.
+    # ------------------------------------------------------------------
     report = await engine.run()
 
     # ------------------------------------------------------------------
-    # 4. Display results
+    # Step 5: Display results.
+    #
+    # The engine can render a Rich terminal table summarizing findings
+    # by module, payload count, and severity. Full reports are also
+    # written to the report directory in JSON and Markdown formats.
     # ------------------------------------------------------------------
     engine.display_results_table(report)
 
-    print(f"\nTotal attacks : {report.total_attacks}")
-    print(f"Successful    : {report.successful_attacks}")
-    print(f"Risk score    : {report.risk_score:.1f} / 100")
+    # ------------------------------------------------------------------
+    # Step 6: Inspect results programmatically.
+    # ------------------------------------------------------------------
+    print(f"\nRisk Score: {report.risk_score:.1f}/100")
+    print(f"Total attacks: {report.total_attacks}")
+    print(f"Successful attacks: {report.successful_attacks}")
+    print(f"Critical findings: {report.summary.critical_findings}")
+    print(f"High findings: {report.summary.high_findings}")
+
+    # Print each successful finding
+    for result in report.results:
+        if result.success:
+            print(f"\n  [{result.severity.value.upper()}] {result.attack_module}")
+            print(f"    {result.description}")
+            if result.evidence:
+                print(f"    Evidence: {result.evidence.details[:200]}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python examples/basic_scan.py <campaign.yaml>")
-        print("Example: python examples/basic_scan.py campaigns/quick_scan.yaml")
-        sys.exit(1)
-
-    campaign_file = Path(sys.argv[1])
-    if not campaign_file.exists():
-        print(f"Error: campaign file not found: {campaign_file}")
-        sys.exit(1)
-
-    asyncio.run(main(str(campaign_file)))
+    asyncio.run(main())
